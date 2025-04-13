@@ -15,9 +15,8 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           root_file: exame.tex
-          args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
-          work_in_root_file_dir: true
-          extra_system_packages: "texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra texlive-lang-portuguese"
+          latexmk_shell_escape: true
+          extra_system_packages: "texlive-full"
 
       - name: Verificar se PDF foi gerado
         run: |
