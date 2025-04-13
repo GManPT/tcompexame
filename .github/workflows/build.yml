@@ -21,7 +21,7 @@ jobs:
     - name: Create deploy directory
       run: |
         mkdir -p public
-        cp YOUR_FILE_NAME.pdf public/  # Substitua pelo nome real do PDF
+        cp exame.pdf public/
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
