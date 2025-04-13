@@ -16,6 +16,9 @@ jobs:
         with:
           root_file: exame.tex
 
+      - name: Guardar PDF temporariamente
+        run: mkdir output && cp exame.pdf output/
+
       - name: Publicar PDF no branch gh-pages
         run: |
           git config --global user.name 'github-actions'
@@ -23,8 +26,7 @@ jobs:
           git fetch
           git switch --orphan gh-pages
           rm -rf ./*
-          mv exame.pdf index.pdf
+          cp ../output/exame.pdf index.pdf
           git add index.pdf
           git commit -m 'Publicar PDF'
           git push -f origin gh-pages
-
