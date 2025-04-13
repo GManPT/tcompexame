@@ -22,8 +22,9 @@ jobs:
           git config --global user.email 'github-actions@github.com'
           git fetch
           git switch --orphan gh-pages
-          git rm -rf .
+          rm -rf ./*
           mv exame.pdf index.pdf
           git add index.pdf
           git commit -m 'Publicar PDF'
           git push -f origin gh-pages
+
