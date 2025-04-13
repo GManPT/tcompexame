@@ -16,16 +16,20 @@ jobs:
         with:
           root_file: exame.tex
           args: -pdf -file-line-error -halt-on-error -interaction=nonstopmode
+          work_in_root_file_dir: true
 
       - name: Verificar se PDF foi gerado
         run: |
           if [ ! -f "exame.pdf" ]; then
             echo "Erro: Arquivo exame.pdf não foi gerado!"
+            ls -al
             exit 1
           fi
 
       - name: Guardar PDF temporariamente
-        run: mkdir -p output && cp exame.pdf output/
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/output
+          cp exame.pdf $GITHUB_WORKSPACE/output/
 
       - name: Publicar PDF no branch gh-pages
         run: |
@@ -34,7 +38,7 @@ jobs:
           git fetch
           git switch --orphan gh-pages
           rm -rf ./*
-          cp output/exame.pdf index.pdf
+          cp $GITHUB_WORKSPACE/output/exame.pdf index.pdf
           git add index.pdf
           git commit -m 'Publicar PDF'
           git push -f origin gh-pages
