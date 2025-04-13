@@ -16,7 +16,7 @@ jobs:
         with:
           root_file: exame.tex
           latexmk_shell_escape: true
-          extra_system_packages: "texlive-full"
+          extra_system_packages: "texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra texlive-lang-portuguese"
 
       - name: Verificar se PDF foi gerado
         run: |
