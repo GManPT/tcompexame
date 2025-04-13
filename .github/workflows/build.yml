@@ -16,7 +16,8 @@ jobs:
         with:
           root_file: exame.tex
           latexmk_shell_escape: true
-          extra_system_packages: "texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra texlive-lang-portuguese"
+          docker_image: danteev/texlive
+
 
       - name: Verificar se PDF foi gerado
         run: |
