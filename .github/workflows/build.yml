@@ -1,30 +1,43 @@
-name: LaTeX to PDF
+name: Compile LaTeX and Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Compile LaTeX document
-      uses: xu-cheng/latex-action@v2
-      with:
-        root_file: exame.tex
-        latexmk_use_xelatex: false    # Usar pdflatex (padrão)
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: exame.tex
 
-    - name: Create deploy directory
-      run: |
-        mkdir -p public
-        cp exame.pdf public/
+      - name: Create deployment directory
+        run: mkdir dist
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GH_PAT }}
-        publish_dir: ./public
+      - name: Move PDF to deployment directory
+        run: mv exame.pdf dist/
+
+      - name: Create index.html
+        run: |
+          echo '<!DOCTYPE html>' > dist/index.html
+          echo '<html lang="en">' >> dist/index.html
+          echo '<head>' >> dist/index.html
+          echo '    <meta http-equiv="refresh" content="0; url=exame.pdf" />' >> dist/index.html
+          echo '    <title>Redirecting to PDF</title>' >> dist/index.html
+          echo '</head>' >> dist/index.html
+          echo '<body>' >> dist/index.html
+          echo '    If you are not redirected automatically, <a href="exame.pdf">click here</a>.' >> dist/index.html
+          echo '</body>' >> dist/index.html
+          echo '</html>' >> dist/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist
