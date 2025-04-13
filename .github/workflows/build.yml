@@ -1,45 +1,30 @@
-name: Compilar LaTeX e Publicar PDF
+name: LaTeX to PDF
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Clonar repositório
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Compilar LaTeX
-        uses: xu-cheng/latex-action@v2
-        with:
-          root_file: exame.tex
-          latexmk_shell_escape: true
-          docker_image: danteev/texlive
+    - name: Compile LaTeX document
+      uses: xu-cheng/latex-action@v2
+      with:
+        root_file: exame.tex
+        latexmk_use_xelatex: false    # Usar pdflatex (padrão)
 
+    - name: Create deploy directory
+      run: |
+        mkdir -p public
+        cp YOUR_FILE_NAME.pdf public/  # Substitua pelo nome real do PDF
 
-      - name: Verificar se PDF foi gerado
-        run: |
-          if [ ! -f "exame.pdf" ]; then
-            echo "Erro: Arquivo exame.pdf não foi gerado!"
-            ls -al
-            exit 1
-          fi
-
-      - name: Guardar PDF temporariamente
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/output
-          cp exame.pdf $GITHUB_WORKSPACE/output/
-
-      - name: Publicar PDF no branch gh-pages
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git fetch
-          git switch --orphan gh-pages
-          rm -rf ./*
-          cp $GITHUB_WORKSPACE/output/exame.pdf index.pdf
-          git add index.pdf
-          git commit -m 'Publicar PDF'
-          git push -f origin gh-pages
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./public
