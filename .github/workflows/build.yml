@@ -1,0 +1,29 @@
+name: Compilar LaTeX e Publicar PDF
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositório
+        uses: actions/checkout@v3
+
+      - name: Compilar LaTeX
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: exame.tex
+
+      - name: Publicar PDF no branch gh-pages
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git fetch
+          git switch --orphan gh-pages
+          git rm -rf .
+          mv exame.pdf index.pdf
+          git add index.pdf
+          git commit -m 'Publicar PDF'
+          git push -f origin gh-pages
