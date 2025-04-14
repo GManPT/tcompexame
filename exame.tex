@@ -150,8 +150,281 @@
 \end{enumerate}
 
 \vspace{1.0cm}
-\section*{Teste 2}
+\subsection*{Recurso (2022/2023)}
+\begin{enumerate}[label=\alph*)]
+  \item (1.5 valores) Considere o alfabeto \(\Sigma = \{0, 1, 2\}\) e as linguagens \(A, B \subseteq \Sigma^*\) tais que:
 
+  \(A\): conjunto das palavras onde nunca ocorrem três símbolos consecutivos iguais
+
+  \(B\): conjunto das palavras em que o número de 0s é o dobro do número de 1s
+
+  Por exemplo, a palavra 02210001 não pertence a \(A\), pois ocorre a subpalavra 000 com três símbolos consecutivos iguais, mas pertence a \(B\), pois ocorrem quatro 0s e dois 1s.
+
+  Mostre (construindo um AFD) que \(A\) é uma linguagem regular.
+
+  \item (1.5 valores) Mostre que \(B\) não é uma linguagem regular.
+
+  \item (1.0 valores) Mostre (construindo um AP) que \(B\) é independente do contexto.
+\end{enumerate}
+
+\subsubsection*{Resolução}
+\begin{enumerate}[label=\alph*)]
+  \item Basta considerar o AFD seguinte, que aceita precisamente as palavras de $A$:
+  \begin{center}
+    % Define a cor personalizada
+    \definecolor{bordaazul}{RGB}{0, 187, 242}
+    \definecolor{fundoestado}{RGB}{200, 240, 255} % Base mais clara
+    
+    \begin{tikzpicture}[
+      shorten >=1pt, 
+      node distance=3.2cm, 
+      on grid, 
+      auto,
+      % Define o estilo dos estados com efeito de sombra
+      state/.append style={
+        draw=bordaazul, 
+        line width=1pt,
+        top color=white!70,
+        bottom color=fundoestado,
+        rounded corners=2pt
+      },
+      % Define o estilo das setas com pontas preenchidas, mas em preto
+      >=latex, 
+      every edge/.append style={draw=black, -latex, line width=0.8pt}
+    ]
+      \node[state, accepting, initial] (q0) {\textcolor{blue}{$q_{in}$}};
+      \node[state, accepting, right of=q0] (q2) {\textcolor{blue}{$q_{1 \square \square }$}};
+      \node[state, accepting, above of=q2] (q1) {\textcolor{blue}{$q_{0 \square \square }$}};
+      \node[state, accepting, below of=q2] (q3) {\textcolor{blue}{$q_{2 \square \square }$}};
+      \node[state, accepting, right of=q1] (q5) {\textcolor{blue}{$q_{0 0 \square }$}};
+      \node[state, accepting, right of=q2] (q6) {\textcolor{blue}{$q_{1 1 \square }$}};
+      \node[state, accepting, right of=q3] (q7) {\textcolor{blue}{$q_{2 2 \square }$}};
+      % Transições
+      \path[->]
+      (q0) edge node {0} (q1)
+           edge node {1} (q2)
+           edge node {2} (q3)
+      (q1) edge [bend left=20] node {1} (q2)
+           edge [bend left=40] node {2} (q3)
+           edge node {0} (q5)
+      (q2) edge [bend left=20] node {0} (q1)
+           edge [bend left=20] node {2} (q3)
+           edge node {1} (q6)
+      (q3) edge [bend right=100] node {0} (q1)
+           edge [bend left=20] node {1} (q2)
+           edge node {2} (q7)
+      (q5) edge node {1} (q2)
+           edge node {2} (q3)
+      (q6) edge node {0} (q1)
+           edge node {2} (q3)
+      (q7) edge node {0} (q1)
+           edge node {1} (q2);
+    \end{tikzpicture}
+  \end{center}
+
+  \vspace{0.5cm}
+  \item Se B fosse uma linguagem regular então, pelo lema da bombagem, existiria $k \in \mathbb{N}$ tal que se $w \in B$ com $|w| \geq k$ então $w=w_1w_2w_3$ com $|w_1w_2|\leq k$, $w_2\neq \varepsilon$ e $w_1w_2^iw_3 \in B$ para todo $i \in \mathbb{N}_0$.
+  
+  No entanto, dado $k$ e, tomando $w=0^{2k}1^{k} \in B$ (pois $|w| = 3k$) ter-se-ia $w_1=0^{j}$, $w_2=0^{l}$ com $l \neq 0$ e $w_3=0^{2k-l-j}1^{k}$.
+
+  Por contradição, dado $i=2$, onde $w=w_1w_2w_2w_3=0^{\cancel{j}}0^{\cancel{l}}0^{l}0^{2k-\cancel{l}-\cancel{j}}1^{k}=0^{2k+l}1^{k} \notin B$ pois $2k+l \neq 2k$ (pois $l \neq 0$).
+
+  \vspace{0.5cm}
+  \item Basta considerar o AP seguinte, que aceita precisamente as palavras de $B$, com alfabeto auxiliar \(\varGamma  = \{0, 1, 2, X\}\):
+  \begin{center}
+    % Define a cor personalizada
+    \definecolor{bordaazul}{RGB}{0, 187, 242}
+    \definecolor{fundoestado}{RGB}{200, 240, 255} % Base mais clara
+    
+    \begin{tikzpicture}[
+      shorten >=1pt, 
+      node distance=3cm, 
+      on grid, 
+      auto,
+      % Define o estilo dos estados com efeito de sombra
+      state/.append style={
+        draw=bordaazul, 
+        line width=1pt,
+        top color=white!70,
+        bottom color=fundoestado,
+        rounded corners=2pt
+      },
+      % Define o estilo das setas com pontas preenchidas, mas em preto
+      >=latex, 
+      every edge/.append style={draw=black, -latex, line width=0.8pt}
+    ]
+        \node[state, initial] (q0) {\textcolor{blue}{$q_{in}$}};
+        \node[state] (q1) [right=of q0] {\textcolor{blue}{$q_1$}};
+        \node[state, accepting] (q2) [right=of q1] {\textcolor{blue}{$q_2$}};
+        \node[state] (q3) [below=of q1] {\textcolor{blue}{$q_3$}};
+
+        \path
+        (q0) edge [] node {$\varepsilon, \varepsilon \to X$} (q1)
+        (q1) edge [loop above] node {\shortstack{
+          $0, \varepsilon \to 0$ \\
+          $0, 1 \to \varepsilon$ \\
+          $2, \varepsilon \to \varepsilon$
+        }} ()
+             edge [] node {$\varepsilon, X \to \varepsilon$} (q2)
+        (q1) edge [bend right=10] node [left] {\shortstack{
+          $1, \varepsilon \to 1$ \\
+          $1, 0 \to \varepsilon$
+        }} (q3)
+        (q3) edge [bend right=10] node [right]  {\shortstack{
+          $\varepsilon, \varepsilon \to 1$ \\
+          $\varepsilon, 0 \to \varepsilon$
+        }}(q1);
+    \end{tikzpicture}
+  \end{center}
+\end{enumerate}
+
+\vspace{1.0cm}
+\section*{Teste 2}
+\subsection*{Recurso (2022/2023)}
+\begin{enumerate}[label=\alph*)]
+  \item (2.5 valores) Mostre (construindo uma máquina de Turing determinista, possivelmente bidireccional, multifita e com movimentos-\(S\)) que é computável a função que para cada par de números em notação binária da forma \(x\$y\) com \(x, y \in \{0, 1\}^*\), devolve como resultado a sua soma (também em notação binária).
+
+  Por exemplo, para a palavra de input \(111\$1001\) o output deverá ser \(10000\) (i.e., \(7 + 9 = 16\)).
+
+  \item (2.5 valores) Sejam \(L_1, L_2 \subseteq \Sigma^*\) linguagens reconhecíveis. Mostre (directamente, sem recorrer a outras propriedades de fecho estudadas), justificando, que também é reconhecível a linguagem
+  \[L = \{uvw \in \Sigma^* : (u \in L_1 \text{ e } w \in L_2) \text{ ou } (u \in L_2 \text{ e } w \in L_1)\}.\]
+\end{enumerate}
+
+\subsubsection*{Resolução}
+\begin{enumerate}[label=\alph*)]
+  \item Basta considerar a MT de duas fitas seguinte, que calcula a função pretendida:
+  \begin{center}
+    % Define a cor personalizada
+    \definecolor{bordaazul}{RGB}{0, 187, 242}
+    \definecolor{fundoestado}{RGB}{200, 240, 255} % Base mais clara
+    
+    \begin{tikzpicture}[
+      shorten >=1pt, 
+      node distance=4.5cm, 
+      on grid, 
+      auto,
+      % Define o estilo dos estados com efeito de sombra
+      state/.append style={
+        draw=bordaazul, 
+        line width=1pt,
+        top color=white!70,
+        bottom color=fundoestado,
+        rounded corners=2pt
+      },
+      % Define o estilo das setas com pontas preenchidas, mas em preto
+      >=latex, 
+      every edge/.append style={draw=black, -latex, line width=0.8pt}
+    ]
+    \node[state, initial] (q0) {\textcolor{blue}{$q_{in}$}};
+    \node[state] (q1) [right=of q0] {\textcolor{blue}{$q_1$}};
+    \node[state] (q2) [right=of q1] {\textcolor{blue}{$q_2$}};
+    \node[state] (q3) [below=of q2] {\textcolor{blue}{$q_3$}};
+    \node[state] (q4) [below=of q0] {\textcolor{blue}{$q_{ac}$}};
+
+    \path
+    (q0) edge [loop above] node {\shortstack{
+      $1 \square \square \to \square 1 \square, RRS$ \\
+      $0 \square \square \to \square 0 \square, RRS$
+    }} ()
+    (q0) edge [] node {$\$ \square \to \square \square, RR$} (q1)
+    (q1) edge [loop above] node {\shortstack{
+      $1 \square \square \to 1 \square \square, RSS$ \\
+      $0 \square \square \to 0 \square \square, RSS$
+    }} ()
+    (q1) edge [] node {$\square \square \square \to \square \square \square, LLS$} (q2)
+    (q2) edge [bend left=10] node {$11\square \to 110, LLL$} (q3)
+    (q2) edge [loop above] node {\shortstack{
+      $1 0 \square \to 1 0 1, LLL$ \\
+      $0 1 \square \to 0 1 1, LLL$ \\
+      $0 0 \square \to 0 0 0, LLL$
+    }} (q3)
+    (q3) edge [loop below] node {\shortstack{
+      $1 0 \square \to 1 0 0, LLL$ \\
+      $0 1 \square \to 0 1 0, LLL$ \\
+      $1 \square \square \to 1 \square 0, LLL$ \\
+      $\square 1 \square \to \square 1 0, LLL$ \\
+      $\square \square \square \to \square \square 1, SSL$
+    }} ()
+    (q3) edge [bend left=10] node {$00 \square \to 001, LLL$} (q2)
+    (q2) edge [] node [above=0.7cm] {$\square \square \square \to \square \square \square, SSL$} (q4)
+    (q3) edge [] node {$\square \square \square \to \square \square \square, SSL$} (q4)
+    ;
+    \end{tikzpicture}
+  \end{center}
+
+  \vspace{0.5cm}
+  \item Seja $D_1, D_2$ máquinas classificadoras de uma fita tal que $L_{ac}(D_1) = L_1$ e $L_{rj}(D_1) = \overline{L_1}$ e $L_{ac}(D_2) = L_2$ e $L_{rj}(D_2) = \overline{L_2}$.
+  
+  Considere-se a MT não-determinista $M$ de 3 fitas seguinte:
+  \begin{center}
+    \begin{tikzpicture}[
+        node distance=1.3cm,  % Distância reduzida entre nós
+        tape/.style={rectangle, draw, minimum width=4.0cm, text width=3.8cm, align=center}, % Fitas menores
+        process/.style={rectangle, minimum width=2.5cm, minimum height=0.8cm, text centered}, % Processos menores
+        decision/.style={rectangle, draw, rounded corners, minimum width=3cm, text width=2.8cm, align=center},
+        state/.style={circle, draw, minimum size=0.8cm, text centered}, % Estados menores
+        arrow/.style={thick,->,>=stealth}
+    ]
+    
+    % Fitas iniciais (menor largura)
+    \node (tapes1) {
+      \begin{tabular}{c}
+          \begin{tabular}{|c|} \hline \makebox[3.8cm]{$z$} \\ \hline \end{tabular} \\
+          \begin{tabular}{|c|} \hline \makebox[3.8cm]{\phantom{a}} \\ \hline \end{tabular} \\
+          \begin{tabular}{|c|} \hline \makebox[3.8cm]{\phantom{a}} \\ \hline \end{tabular}
+      \end{tabular}
+    };
+  
+    % Reduzidos espaçamentos verticais
+    \node[process, below=0.6cm of tapes1, align=center, text width=3.2cm, inner sep=4pt] (copia) {Copia não-det um prefixo de $z=uvw$, onde $u$ é colocado na fita 2 e $v$ na fita 3};
+    \draw[arrow] (tapes1.south) -- (copia.north);
+    
+    \node (tapes2) [below=0.6cm of copia] {
+      \begin{tabular}{c}
+          \begin{tabular}{|c|} \hline \makebox[3.8cm]{$\cdots$} \\ \hline \end{tabular} \\
+          \begin{tabular}{|c|} \hline \makebox[3.8cm]{$u$} \\ \hline \end{tabular} \\
+          \begin{tabular}{|c|} \hline \makebox[3.8cm]{$w$} \\ \hline \end{tabular}
+      \end{tabular}
+    };
+    \draw[arrow] (copia.south) -- (tapes2.north);
+
+    \node[process, below=0.6cm of tapes2, align=center, text width=3.2cm, inner sep=4pt] (escolher) {Escolher não-det};
+    \draw[arrow] (tapes2.south) -- (escolher.north);
+
+    % Escolha não-determinista
+    \node[process, below left=1.2cm of escolher, align=center, text width=3.2cm, inner sep=4pt] (escolha1) {Executa $D_1$ na fita 2};
+    \draw[arrow] (escolher.south) -- (escolha1.north);
+  
+    \node[process, below right=1.2cm of escolher, align=center, text width=3.2cm, inner sep=4pt] (escolha2) {Executa $D_2$ na fita 2};
+    \draw[arrow] (escolher.south) -- (escolha2.north);
+
+    \node[process, below=1.2cm of escolha1, align=center, text width=3.2cm, inner sep=4pt] (depois1) {Executa $D_2$ na fita 3};
+    \draw[arrow] (escolha1.south) -- node[xshift=10mm, font=\small] {Se aceita} (depois1.north);
+    
+    \node[state, below=1.2cm of depois1] (accept1) {$q_{ac}$};
+    \draw[arrow] (depois1.south) -- node [xshift=10mm, font=\small] {Se aceita} (accept1.north);
+
+    \node[process, below=1.2cm of escolha2, align=center, text width=3.2cm, inner sep=4pt] (depois2) {Executa $D_1$ na fita 3};
+    \draw[arrow] (escolha2.south) -- node[xshift=10mm, font=\small] {Se aceita} (depois2.north);
+
+    \node[state, below=1.2cm of depois2] (accept2) {$q_{ac}$};
+    \draw[arrow] (depois2.south) -- node [xshift=10mm, font=\small] {Se aceita} (accept2.north);
+  
+    \end{tikzpicture}
+  \end{center}
+
+  $M$ é classificadora pois tem árvores de computação finitas, já que $D_1, D_2$ são classificadoras e a palavra $z$ se decompõe em $z=uvw$ de um número finito de maneiras.
+
+  $M$ aceita a palavra $z$ se, e só se:
+  \begin{itemize}
+    \item $z=uvw$, $D_1$ aceita $u$ e $D_2$ aceita $w$, ou $D_2$ aceita $u$ e $D_1$ aceita $w$.
+    \item $z=uvw$, $u \in L_1$ e $w \in L_2$ ou $u \in L_2$ e $w \in L_1$
+    \item $L = \{uvw \in \Sigma^* : (u \in L_1 \text{ e } w \in L_2) \text{ ou } (u \in L_2 \text{ e } w \in L_1)\}$.
+  \end{itemize}
+
+\end{enumerate}
+
+\vspace{1.0cm}
 \subsection*{Recurso (2023/2024)}
 \begin{enumerate}[label=\alph*)]
   \item (2.5 valores) Mostre (construindo uma máquina de Turing determinista, possivelmente bidireccional, multifita e com movimentos-\(S\)) que é decidível a linguagem \(L \subseteq \{1, \$\}^*\) formada pelas listas ordenadas (por ordem crescente, não estrita) de números em notação unária da forma \(1^{n_1} \$ 1^{n_2} \$ \ldots \$ 1^{n_k}\) com \(k, n_1, \ldots, n_k \in \mathbb{N}_0\) e \(n_1 \leq n_2 \leq \cdots \leq n_k\).
@@ -1633,5 +1906,199 @@
     O cálculo de \( f(x) \) leva tempo polinomial, logo espaço polinomial. A verificação de \( y \in L_1 \) leva espaço polinomial em \( |y| \), que é polinomial em \( |x| \). Portanto, o processo total para decidir \( \overline{L_2} \) usa espaço polinomial. Assim, \( \overline{L_2} \in \mathbf{PSPACE} \).
     Sabendo que a classe \( \mathbf{PSPACE} \) é fechada por complemento, concluímos que \( L_2 = \overline{\overline{L_2}} \in \mathbf{PSPACE} \).
   \end{enumerate}
+\end{enumerate}
+
+\vspace{1.0cm}
+\subsection*{Recurso (2022/2023)}
+\begin{enumerate}[label=\alph*)]
+  \item (4.5 valores) Dada uma classe de linguagens \(\mathcal{C}\) define-se a classe  
+  \[ r(\mathcal{C}) = \{L : \text{existe } A \in \mathcal{C} \text{ tal que } L \leq_P A\}. \]  
+  
+  Justifique cuidadosamente a resposta a cada uma das seguintes questões:  
+  
+  \begin{enumerate}[label=(\roman*)]
+      \item Mostre que uma linguagem \(\mathcal{C}\)-completa é necessariamente \(r(\mathcal{C})\)-completa.  
+      Será que uma linguagem \(r(\mathcal{C})\)-completa é necessariamente \(\mathcal{C}\)-completa?  
+      
+      \item Mostre que se \(B\) é uma linguagem \textbf{NP}-completa então \(r(\{B\}) = \textbf{NP}\).  
+      
+      \item Será que \(r(\textbf{TIME}(n)) = \textbf{P}\)?  
+  \end{enumerate}
+  
+  \item (1.5 valores) É um problema em aberto saber se \(\textbf{TIME}(n) = \textbf{SPACE}(n)\). Demonstre, no entanto, que \(\textbf{TIME}(n) \subsetneq \textbf{SPACE}(n^2)\).
+\end{enumerate}
+
+\subsubsection*{Resolução}
+\begin{enumerate}[label=\alph*)]
+  \item Dada uma classe de linguagens $\mathcal{C}$ define-se a classe
+  \[
+  r(\mathcal{C}) = \{ L \mid \exists A \in \mathcal{C} \text{ tal que } L \leq_P A \}.
+  \]
+
+  \begin{enumerate}[label=(\roman*)]
+    \item Se $A$ é $\mathcal{C}$-completa, então, por definição, $A \in \mathcal{C}$ e para toda linguagem $B \in \mathcal{C}$ temos $B \leq_P A$.  
+    Seja $L \in r(\mathcal{C})$. Por definição, existe $C \in \mathcal{C}$ tal que $L \leq_P C$.  
+    Mas, como $C \leq_P A$ (pois $A$ é $\mathcal{C}$-completa) e as reduções polinomiais são transitivas, segue que
+    \[
+    L \leq_P C \leq_P A,
+    \]
+    isto é, $L \leq_P A$. Portanto, toda linguagem em $r(\mathcal{C})$ se reduz a $A$, o que mostra que $A$ é, além de pertencer a $\mathcal{C}$, $r(\mathcal{C})$-difícil.  
+    Como $A \in \mathcal{C} \subseteq r(\mathcal{C})$ (pois toda linguagem em $\mathcal{C}$ é, trivialmente, reduzível a si mesma), concluímos que $A$ é $\mathcal{C}$-completa $\Rightarrow$ $A$ é $r(\mathcal{C})$-completa.
+    
+    \vspace{0.3cm}
+    Porém, se $A$ é $r(\mathcal{C})$-completa, isto significa que $A \in r(\mathcal{C})$, isto é, existe alguma linguagem $C \in \mathcal{C}$ tal que $A \leq_P C$, e que para toda linguagem $B \in r(\mathcal{C})$, temos $B \leq_P A$.  
+    Contudo, não se garante, a partir desta hipótese, que $A \in \mathcal{C}$ (poderia ser, por exemplo, uma linguagem "mais difícil" que não pertença a $\mathcal{C}$, mas que ainda é capaz de "capturar" todas as linguagens de $\mathcal{C}$ via redução).  
+    Portanto, uma linguagem $r(\mathcal{C})$-completa não é, em geral, necessariamente $\mathcal{C}$-completa.
+    
+    \vspace{0.5cm}
+    \item Observe que, por definição,
+    \[
+    r(\{B\}) = \{ L \mid L \leq_P B \}.
+    \]
+    Como $B$ é $\mathbf{NP}$-completa, temos que:
+    \begin{itemize}
+      \item Todo problema $L \in \mathbf{NP}$ é polinomialmente redutível a $B$, isto é, $L \leq_P B$. Assim, $L \in r(\{B\})$.  
+      \item Reciprocamente, se $L \in r(\{B\})$, isto é, $L \leq_P B$, e sabendo que $B \in \mathbf{NP}$ e as reduções polinomiais preservam a decidibilidade em NP, segue que $L \in \mathbf{NP}$.
+    \end{itemize}
+    Portanto, temos a equivalência:
+    \[
+    r(\{B\}) = \{ L \mid L \leq_P B \} = \mathbf{NP}.
+    \]
+    
+    \vspace{0.5cm}
+    \item Por definição,
+    \[
+    r(\textbf{TIME}(n)) = \{ L \mid \exists A \in \textbf{TIME}(n) \text{ tal que } L \leq_P A \}.
+    \]
+    Note que, para qualquer $A \in \textbf{TIME}(n)$, temos $A \in \mathbf{P}$, já que $\textbf{TIME}(n) \subseteq \mathbf{P}$.  
+    Se $L \in r(\textbf{TIME}(n))$, então existe um $A \in \textbf{TIME}(n)$ tal que $L \leq_P A$. Como as reduções polinomiais preservam a decidibilidade em tempo polinomial (isto é, se $A \in \mathbf{P}$, então $L \in \mathbf{P}$), conclui-se que 
+    \[
+    r(\textbf{TIME}(n)) \subseteq \mathbf{P}.
+    \]
+    Contudo, a inclusão inversa, isto é, se $L \in \mathbf{P}$ então $L \in r(\textbf{TIME}(n))$, não é necessariamente verdadeira, pois uma linguagem em $\mathbf{P}$ pode não ser redutível, em tempo polinomial, a uma linguagem que pode ser decidida em tempo linear.  
+    Assim, em geral, não se tem $r(\textbf{TIME}(n)) = \mathbf{P}$.
+  \end{enumerate}
+
+  \vspace{0.5cm}
+  \item Para mostrar que $\textbf{TIME}(n) \subsetneq \textbf{SPACE}(n^2)$, vamos demonstrar ambas: inclusão e inclusão estrita.
+
+  \vspace{0.3cm}
+  \underline{Inclusão:}  
+  
+  Se uma máquina de Turing roda em tempo linear, isto é, em \(\mathbf{TIME}(n)\), então ela pode, no máximo, acessar \(O(n)\) células na fita durante a sua execução.  
+  Portanto, temos
+  \[
+  \mathbf{TIME}(n) \subseteq \mathbf{SPACE}(n).
+  \]
+  Como é trivial que \(\mathbf{SPACE}(n) \subseteq \mathbf{SPACE}(n^2)\), conclui-se que
+  \[
+  \mathbf{TIME}(n) \subseteq \mathbf{SPACE}(n^2).
+  \]
+
+  \vspace{0.3cm}
+  \underline{Inclusão estrita:}  
+  
+  Para mostrar que a inclusão é estrita, aplicamos o \textbf{Teorema da Hierarquia de Tempo}, que estabelece que se \(f(n)\) e \(g(n)\) são funções de tempo tais que
+  \[
+  f(n)\log f(n) = o(g(n)),
+  \]
+  então
+  \[
+  \mathbf{TIME}(f(n)) \subsetneq \mathbf{TIME}(g(n)).
+  \]
+  Tomando \(f(n) = n\) e \(g(n) = n^2\), temos que
+  \[
+  n\log n = o(n^2),
+  \]
+  de modo que:
+  \[
+  \mathbf{TIME}(n) \subsetneq \mathbf{TIME}(n^2).
+  \]
+  Por outro lado, é sabido que
+  \[
+  \mathbf{TIME}(n^2) \subseteq \mathbf{SPACE}(n^2),
+  \]
+  pois uma máquina que decide uma linguagem em tempo \(n^2\) utiliza, no máximo, \(n^2\) células da fita.
+
+  Portanto, existe ao menos uma linguagem que pode ser decidida em tempo \(n^2\) (e, consequentemente, em espaço \(n^2\)) que não pode ser decidida em tempo linear.  
+  Concluímos que a inclusão
+  \[
+  \mathbf{TIME}(n) \subseteq \mathbf{SPACE}(n^2)
+  \]
+  é, de fato, estrita, isto é,
+  \[
+  \mathbf{TIME}(n) \subsetneq \mathbf{SPACE}(n^2).
+  \]
+\end{enumerate}
+
+
+\vspace{1.0cm}
+\subsection*{Perguntas Extra}
+
+\begin{enumerate}[label=\arabic*)]
+  \item Para mostrar que $\textbf{NTIME}(n) \subsetneq \textbf{PSPACE}$, vamos demonstrar ambas: inclusão e inclusão estrita.
+
+  \vspace{0.3cm}
+  \underline{Inclusão:}  
+  
+  Se uma máquina de Turing não determinística roda em tempo linear, isto é, em \(\mathbf{NTIME}(n)\), então cada ramo computacional pode, no máximo, acessar \(O(n)\) células na fita durante a sua execução.  
+  Portanto, temos
+  \[
+  \mathbf{NTIME}(n) \subseteq \mathbf{NSPACE}(n).
+  \]
+  
+  Pelo Teorema de Savitch, sabemos que
+  \[
+  \mathbf{NSPACE}(n) \subseteq \mathbf{DSPACE}(n^2).
+  \]
+  
+  Como \(n^2\) é um polinómio, segue-se que:
+  \[
+  \mathbf{DSPACE}(n^2) \subseteq \mathbf{PSPACE}.
+  \]
+  
+  Assim, conclui-se que
+  \[
+  \mathbf{NTIME}(n) \subseteq \mathbf{PSPACE}.
+  \]
+
+  \vspace{0.3cm}
+  \underline{Inclusão estrita:}  
+  
+  Para mostrar que a inclusão é estrita, utilizamos o \textbf{Teorema da Hierarquia de Espaço}, que estabelece que se \(f(n)\) e \(g(n)\) são funções construtíveis no espaço tais que \(f(n) \in o(g(n))\), então
+  \[
+  \mathbf{DSPACE}(f(n)) \subsetneq \mathbf{DSPACE}(g(n)).
+  \]
+  
+  Tomando \(f(n) = n\) e \(g(n) = n^2\), temos que
+  \[
+  n = o(n^2),
+  \]
+  
+  de modo que:
+  \[
+  \mathbf{DSPACE}(n) \subsetneq \mathbf{DSPACE}(n^2).
+  \]
+  
+  Por outro lado, sabemos que
+  \[
+  \mathbf{NTIME}(n) \subseteq \mathbf{NSPACE}(n) \subseteq \mathbf{DSPACE}(n^2),
+  \]
+  
+  e também que
+  \[
+  \mathbf{NTIME}(n) \subseteq \mathbf{DSPACE}(n) \subsetneq \mathbf{DSPACE}(n^2) \subseteq \mathbf{PSPACE}.
+  \]
+  
+  Portanto, existe ao menos uma linguagem que pode ser decidida em espaço \(n^2\) (e, consequentemente, em \(\mathbf{PSPACE}\)) que não pode ser decidida em tempo não determinístico linear.  
+  Concluímos que a inclusão
+  \[
+  \mathbf{NTIME}(n) \subseteq \mathbf{PSPACE}
+  \]
+  é, de fato, estrita, isto é,
+  \[
+  \mathbf{NTIME}(n) \subsetneq \mathbf{PSPACE}.
+  \]
+
 \end{enumerate}
 \end{document}
