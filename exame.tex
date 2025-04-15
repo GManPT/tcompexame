@@ -929,91 +929,79 @@
 
   \begin{center}
     \begin{tikzpicture}[
-        node distance=1.4cm, % Distância intermédia
-        tape/.style={rectangle, draw, minimum width=4.5cm, text width=4.3cm, align=center}, % Tamanho intermédio
-        process/.style={rectangle, minimum width=2.8cm, minimum height=0.9cm, text centered, font=\small}, % Tamanho e fonte intermédios
-        decision/.style={rectangle, draw, rounded corners, minimum width=3cm, text width=2.8cm, align=center},
-        state/.style={circle, draw, minimum size=0.85cm, text centered, font=\small}, % Tamanho intermédio
+        node distance=1.4cm, 
+        tape/.style={rectangle, draw, minimum width=4.5cm, text width=4.3cm, align=center},
+        process/.style={rectangle, minimum width=2.8cm, minimum height=0.9cm, text centered, font=\small},
+        state/.style={circle, draw, minimum size=0.85cm, text centered, font=\small},
         arrow/.style={thick,->,>=stealth}
     ]
     
-    % Etapa inicial - Input centralizado
+    % Input inicial
     \node (tapes1) {
       \begin{tabular}{c}
           \begin{tabular}{|c|} \hline \makebox[4.3cm]{$w$} \\ \hline \end{tabular} \\
-          \begin{tabular}{|c|} \hline \makebox[4.3cm]{\phantom{a}} \\ \hline \end{tabular} \\
           \begin{tabular}{|c|} \hline \makebox[4.3cm]{\phantom{a}} \\ \hline \end{tabular}
       \end{tabular}
     };
     
-    % Etapa 1 - Divide não-deterministicamente o input em u e v
-    \node[process, below=0.7cm of tapes1, text width=3.5cm] (divide) {Copia não-det $w = uv$: $u \to$ fita 3, $v \to$ fita 1};
+    % Divide não-deterministicamente
+    \node[process, below=0.7cm of tapes1, text width=3.5cm] (divide) {Copia não-det $w = uv$: $u$ para a fita 2, $v$ para a fita 1};
     \draw[arrow] (tapes1.south) -- (divide.north);
     
-    % Fitas após a divisão
+    % Fitas após divisão
     \node[below=0.7cm of divide] (tapes1b) {
         \begin{tabular}{c}
             \begin{tabular}{|c|} \hline \makebox[4.3cm]{$v$} \\ \hline \end{tabular} \\
-            \begin{tabular}{|c|} \hline \makebox[4.3cm]{\phantom{a}} \\ \hline \end{tabular} \\
             \begin{tabular}{|c|} \hline \makebox[4.3cm]{$u$} \\ \hline \end{tabular}
         \end{tabular}
     };
     \draw[arrow] (divide.south) -- (tapes1b.north);
     
-    % Etapa 2 - Copia v para fita 2
-    \node[process, below=0.7cm of tapes1b] (copy) {Copia $v$ da fita 1 para 2};
-    \draw[arrow] (tapes1b.south) -- (copy.north);
+    % Verifica se u ∈ L₁
+    \node[process, below=0.7cm of tapes1b] (runD1u) {Executa $D_1$ na fita 2};
+    \draw[arrow] (tapes1b.south) -- (runD1u.north);
     
-    % Fitas após a cópia
-    \node[below=0.7cm of copy] (tapes2) {
+    % Estado das fitas após aceitar u
+    \node[below=0.7cm of runD1u] (tapes3) {
         \begin{tabular}{c}
-            \begin{tabular}{|c|} \hline \makebox[4.3cm]{$v$} \\ \hline \end{tabular} \\
-            \begin{tabular}{|c|} \hline \makebox[4.3cm]{$v$} \\ \hline \end{tabular} \\
-            \begin{tabular}{|c|} \hline \makebox[4.3cm]{$u$} \\ \hline \end{tabular}
-        \end{tabular}
-    };
-    \draw[arrow] (copy.south) -- (tapes2.north);
-    
-    % Etapa 3 - Executa D1 sobre u
-    \node[process, below=0.7cm of tapes2] (runD1u) {Executa $D_1$ na fita 3};
-    \draw[arrow] (tapes2.south) -- (runD1u.north);
-    
-    % Rejeita se D1 rejeita u
-    \node[state, below right=1.1cm of runD1u] (rej1) {$q_{rej}$};
-    \draw[arrow] (runD1u.south) -- node [xshift=7mm, yshift=2mm, font=\small] {Se rejeita} (rej1.north);
-    
-    % Estado das fitas após D1 aceitar u
-    \node[below left=1.1cm of runD1u] (tapes3) {
-        \begin{tabular}{c}
-            \begin{tabular}{|c|} \hline \makebox[4.3cm]{$v$} \\ \hline \end{tabular} \\
             \begin{tabular}{|c|} \hline \makebox[4.3cm]{$v$} \\ \hline \end{tabular} \\
             \begin{tabular}{|c|} \hline \makebox[4.3cm]{$\cdots$} \\ \hline \end{tabular}
         \end{tabular}
     };
-    \draw[arrow] (runD1u.south) -- node[xshift=-4mm, yshift=3mm, font=\small] {Se aceita} (tapes3.north);
+    \draw[arrow] (runD1u.south) -- node[right, font=\small] {Se aceita} (tapes3.north);
     
-    % Etapa 4 - Executa D1 e D2 sobre v em fitas diferentes
-    \node[process, below=0.7cm of tapes3, align=center, text width=3.2cm, inner sep=4pt] (runDv) {Executa $D_1$ na fita 1 e $D_2$ na fita 2};
-    \draw[arrow] (tapes3.south) -- (runDv.north);
+    % Escolha não-determinística
+    \node[process, below=0.7cm of tapes3] (escolher) {Escolher não-det};
+    \draw[arrow] (tapes3.south) -- (escolher.north);
     
-    % Rejeita se ambos aceitam v
-    \node[state, below right=1.4cm of runDv] (rej2) {$q_{rej}$};
-    \draw[arrow] (runDv.south) -- node [xshift=12mm, yshift=2mm, font=\small] {Ambos aceitam} (rej2.north);
+    % Verifica v ∉ L₁
+    \node[process, below left=1.2cm of escolher] (exec1) {Executa $D_1$ na fita 1};
+    \draw[arrow] (escolher.south) -- (exec1.north);
     
-    % Aceita caso contrário
-    \node[state, below left=1.4cm of runDv] (acc) {$q_{ac}$};
-    \draw[arrow] (runDv.south) -- node [xshift=-10mm, yshift=3mm, font=\small] {Caso contrário} (acc.north);
+    % Verifica v ∉ L₂
+    \node[process, below right=1.2cm of escolher] (exec2) {Executa $D_2$ na fita 1};
+    \draw[arrow] (escolher.south) -- (exec2.north);
+    
+    % Estados de aceitação
+    \node[state, below=1.2cm of exec1] (acc1) {$q_{ac}$};
+    \draw[arrow] (exec1.south) -- node [right, font=\small] {Se rejeita} (acc1.north);
+    
+    \node[state, below=1.2cm of exec2] (acc2) {$q_{ac}$};
+    \draw[arrow] (exec2.south) -- node [right, font=\small] {Se rejeita} (acc2.north);
     
     \end{tikzpicture}
-    \end{center}
-
+  \end{center}
+  
+  \vspace{0.5cm}
   $M$ é classificadora pois tem árvores de computação finitas já que $D_1$ e $D_2$ são classificadoras e $w$ se decompõe em $w = uv$ de um número finito de maneiras.
 
-  $M$ aceita $w$ se, e só se:
+  $M$ aceita $w$ se, e só se existe uma decomposição $w = uv$ tal que:
   \begin{itemize}
-      \item $w = uv$, $D_1$ aceita $u$ e $D_1$ e $D_2$ não aceitam ambos $v$;
-      \item $w = uv$, $u \in L_1$ e $v \notin L_1 \cap L_2$;
-      \item $w \in L_1 \cdot \overline{L_1 \cap L_2}$.
+      \item $D_1$ aceita $u$ \textbf{e} ($D_1$ rejeita $v$ \textbf{ou} $D_2$ rejeita $v$)
+      \item $u \in L_1$ \textbf{e} ($v \notin L_1$ \textbf{ou} $v \notin L_2$)
+      \item $u \in L_1$ \textbf{e} $v \in (\overline{L_1} \cup \overline{L_2})$
+      \item $u \in L_1$ \textbf{e} $v \in \overline{L_1 \cap L_2}$ (pela lei de De Morgan)
+      \item $w \in L_1 \cdot \overline{L_1 \cap L_2}$
   \end{itemize}
 \end{enumerate}
 
@@ -2101,4 +2089,51 @@
   \]
 
 \end{enumerate}
+
+\vspace{1.0cm}
+\begin{enumerate}[label=\arabic*)]
+  \setcounter{enumi}{1}
+  \item Seja um alfabeto $\Sigma$ sem o símbolo \$ e considere linguagens $A, B, C, L \subseteq \Sigma^*$ tais que:
+  \begin{itemize}
+      \item $A \leq_P B \cap C$,
+      \item $B \leq_P L$,
+      \item $C \leq_P \overline{L}$.
+  \end{itemize}
+
+  \vspace{0.3cm}
+  Mostre, justificando, que $A \leq_P \{w_1\$w_2 : w_1 \in L \text{ e } w_2 \in \Sigma^* \setminus L\}$.
+  
+  \vspace{0.5cm}
+  \textbf{Resolução:}
+  
+  \begin{itemize}
+      \item Como $A \leq_P B \cap C$, existe uma função $f:\Sigma^* \to \Sigma^*$ total e computável por uma máquina de Turing $F$ com $time_F(n) = O(n^a)$ tal que $x \in A$ sse $f(x) \in B \cap C$.
+      
+      \vspace{0.3cm}
+      \item Como $B \leq_P L$, existe uma função $g:\Sigma^* \to \Sigma^*$ total e computável por uma máquina de Turing $G$ com $time_G(n) = O(n^b)$ tal que $x \in B$ sse $g(x) \in L$.
+      
+      \vspace{0.3cm}
+      \item Como $C \leq_P \overline{L}$, existe uma função $h:\Sigma^* \to \Sigma^*$ total e computável por uma máquina de Turing $H$ com $time_H(n) = O(n^c)$ tal que $x \in C$ sse $h(x) \in \overline{L}$.
+  \end{itemize}
+
+  \vspace{0.3cm}
+  Definimos a função $k:\Sigma^* \to \Sigma^*$ por $k(x) = g(f(x))\$h(f(x))$. Esta função é total e computável em tempo polinomial, pois $f$, $g$ e $h$ são computáveis em tempo polinomial e a concatenação com o símbolo \$ é feita em tempo linear. Uma máquina de Turing $K$ computa $k$ com tempo:
+  \begin{align*}
+      time_K(n) &= O(time_F(n) + time_G(n+time_F(n)) + time_H(n+time_F(n))) \\
+      &= O(n^a + (n+n^a)^b + (n+n^a)^c) \ \text{ que é um polinómio. }
+  \end{align*}
+
+  Além disso, para qualquer $x \in \Sigma^*$, temos:
+  \begin{align*}
+      x \in A &\iff f(x) \in B \cap C \\
+      &\iff f(x) \in B \text{ e } f(x) \in C \\
+      &\iff g(f(x)) \in L \text{ e } h(f(x)) \in \overline{L} \\
+      &\iff g(f(x)) \in L \text{ e } h(f(x)) \in \Sigma^* \setminus L \\
+      &\iff k(x) = g(f(x))\$h(f(x)) \in \{w_1\$w_2 : w_1 \in L \text{ e } w_2 \in \Sigma^* \setminus L\}
+  \end{align*}
+
+  Concluímos que $A \leq_P \{w_1\$w_2 : w_1 \in L \text{ e } w_2 \in \Sigma^* \setminus L\}$.
+\end{enumerate}
+
+
 \end{document}
