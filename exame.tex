@@ -1821,14 +1821,18 @@
 \begin{enumerate}[label=\alph*)]
   \item
   \begin{enumerate}[label=(\roman*)]
-    \item \textbf{NÃO.}
+    \item \textbf{SIM.}
 
     \vspace{0.3cm}
     Sabemos que $L_1 \in \mathbf{NP}\text{-completa}$, ou seja, $L_1 \in \mathbf{NP}$ e para todo $A \in \mathbf{NP}$ temos $A \leq_P L_1$.  
     Dada a hipótese $\overline{L_2} \leq_P \overline{L_1}$, pelo fechamento por complemento das reduções polinomiais, obtemos 
     $$L_2 \leq_P L_1.$$ 
-    Entretanto, essa redução apenas mostra que a dificuldade de $L_2$ é, no máximo, a de $L_1$; não se pode concluir, a partir desta informação, que $L_2 \in \mathbf{NP}$.  
-    Portanto, não é garantido que $L_2 \in \mathbf{NP}$.
+    Como $L_1 \in \mathbf{NP}$, podemos construir um verificador não-determinístico para $L_2$ da seguinte forma:
+    \begin{enumerate}
+      \item Para uma entrada $x$, calcular $f(x)$ em tempo polinomial, onde $f$ é a função de redução
+      \item Utilizar o verificador de $L_1$ (que funciona em tempo polinomial) para verificar $f(x)$
+    \end{enumerate}
+    Como ambos os passos executam em tempo polinomial, o verificador completo para $L_2$ também executa em tempo polinomial não-determinístico. Portanto, $L_2 \in \mathbf{NP}$.
 
     \vspace{0.5cm}
     \item \textbf{NÃO.}
@@ -1845,9 +1849,9 @@
     \vspace{0.3cm}
     Note que
     $$L_1 \setminus L_2 = L_1 \cap \overline{L_2}.$$
-    Sabemos que $L_1 \in \mathbf{NP}$ e, consequentemente, $L_1$ é decidível em tempo exponencial determinístico (isto é, $\mathbf{NP} \subseteq \mathbf{EXPTIME}$).  
-    Embora não possamos concluir que $L_2 \in \mathbf{NP}$, a hipótese $\overline{L_2} \leq_P \overline{L_1}$ nos permite supor, pelo menos, que $L_2$ é decidível, pois as reduções polinomiais só se aplicam a linguagens decidíveis.  
-    Se ambos $L_1$ e $L_2$ são decidíveis e $L_1 \in \mathbf{EXPTIME}$, e visto que a classe $\mathbf{EXPTIME}$ é fechada por complemento e interseção, conclui-se que
+    Sabemos que $L_1 \in \mathbf{NP}$ (por definição de NP-completude) e que $L_2 \in \mathbf{NP}$ (como demonstrado no item (i)). Consequentemente, ambas as linguagens são decidíveis em tempo exponencial determinístico (isto é, $\mathbf{NP} \subseteq \mathbf{EXPTIME}$).  
+    Como a classe $\mathbf{EXPTIME}$ é fechada por complemento e interseção, temos que $\overline{L_2} \in \mathbf{EXPTIME}$ e $L_1 \cap \overline{L_2} \in \mathbf{EXPTIME}$.
+    Portanto, conclui-se que
     $$L_1 \setminus L_2 \in \mathbf{EXPTIME}.$$
   \end{enumerate}
 \end{enumerate}
